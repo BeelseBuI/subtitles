@@ -34,6 +34,7 @@ KNOWN_LANGS = {
     'ko': 'ko', 'kor': 'ko',
 }
 
+
 class SubtitleApp(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -147,11 +148,12 @@ class SubtitleApp(tk.Tk):
             cfg_path = os.path.join(vse_dir, 'settings.ini')
             lang_code = v['lang'].get().strip()
             with open(cfg_path, 'w', encoding='utf-8') as cfg:
-                cfg.write(f"[DEFAULT]
-Interface = English
-Language = {lang_code}
-Mode = fast
-")
+                cfg.write(
+                    "[DEFAULT]\n"
+                    "Interface = English\n"
+                    f"Language = {lang_code}\n"
+                    "Mode = fast\n"
+                )
             # Launch VSE CLI and feed inputs automatically
             proc = subprocess.Popen(
                 [python_venv, '-m', 'backend.main'],
@@ -164,13 +166,12 @@ Mode = fast
                 errors='ignore'
             )
             area_input = v['area'].get().strip()
-            prompt_data = f"{vid1}
-{area_input}
-"
+            prompt_data = f"{vid1}\n{area_input}\n"
             outp, errp = proc.communicate(prompt_data)
             if proc.returncode != 0:
-                raise RuntimeError(f"Extractor failed. stdout: {outp}
-stderr: {errp}")
+                raise RuntimeError(
+                    f"Extractor failed. stdout: {outp}\nstderr: {errp}"
+                )
             orig = os.path.join(vse_dir, 'output.srt')
 
             # 5) Translate
@@ -193,8 +194,10 @@ stderr: {errp}")
             # 7) Cleanup
             self._update('Cleaning up')
             for fpath in (vid1, vid2, orig, trans):
-                try: os.remove(fpath)
-                except: pass
+                try:
+                    os.remove(fpath)
+                except:
+                    pass
 
             self._update('Done')
         except Exception as e:
@@ -230,6 +233,7 @@ stderr: {errp}")
         )
         with open(outs, 'w', encoding='utf-8') as f:
             f.write(resp.choices[0].message.content)
+
 
 if __name__ == '__main__':
     SubtitleApp().mainloop()
